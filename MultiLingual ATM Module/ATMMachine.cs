@@ -13,10 +13,14 @@ namespace MultiLingual_ATM_Module
         public void AtmBegin()
         {
             Console.WriteLine("Welcome to Zenith Bank");
+        
+            Repeat: 
+
             Console.WriteLine("Select your preferred language. Reply \n 1. For English Press 1 \n 2: Ichoro Asusu Igbo, pia abuo \n 3: Don zaɓar Hausa danna 3");
-            _preferredLanguage = int.Parse(Console.ReadLine());
+            int.TryParse(Console.ReadLine(), out _preferredLanguage);
+            
 
-
+             
                  switch (_preferredLanguage)
                 {
                     case ((int)SelectedLanguage.English):
@@ -40,9 +44,8 @@ namespace MultiLingual_ATM_Module
                     break;
 
                     default:
-                        Console.WriteLine("The language selection is not valid");
-                        Console.WriteLine("Select your preferred language. Reply \n 1: English \n 2: French \n 3: Igbo");
-                    _preferredLanguage = int.Parse(Console.ReadLine());
+                    Console.WriteLine("Your input is not valid. Enter a Number that matches the selection provided");
+                      goto Repeat;
 
                     break;
                 }

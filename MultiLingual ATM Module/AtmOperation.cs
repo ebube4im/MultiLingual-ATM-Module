@@ -10,7 +10,7 @@ namespace MultiLingual_ATM_Module
     internal class AtmOperation
     {
         long _cardNumber;
-        int _cardPin;
+        long _cardPin;
         public void Begin()
         {
             try
@@ -19,17 +19,34 @@ namespace MultiLingual_ATM_Module
                 if (Global.PreferredLanguage == (int)SelectedLanguage.English)
                 {
                     Console.WriteLine("Welcome to Zenith Bank Atm Machine");
+                   
+                    Reenter_CardNumber:
                     Console.WriteLine("Enter your Card number");
 
-                    _cardNumber = long.Parse(Console.ReadLine());
+                    if (!long.TryParse(Console.ReadLine(), out _cardNumber))
+                    {
+                        Console.WriteLine("The Card Number entered is not valid!");
+                        goto Reenter_CardNumber;
+                    }
+                   
+                   
+                 
 
+                    Reenter_CardPin:
                     Console.WriteLine("Enter your Card pin");
-                    _cardPin = int.Parse(Console.ReadLine());
 
-                    if (_cardNumber != null && _cardPin != null)
+                    if (!long.TryParse(Console.ReadLine(), out _cardPin))
+                    {
+                        Console.WriteLine("The Card Pin entered is not valid!");
+                        goto Reenter_CardPin;
+                    }
+
+                  
+
+                    if (_cardNumber != 0 && _cardPin != 0)
                     {
                         AccountUser accountUser = new AccountUser();
-                        accountUser = accountUser.GenerateRandomUsers().Find(User => User.CardNumber == _cardNumber);
+                        accountUser = accountUser.UserStore().FirstOrDefault(User => User.CardNumber == _cardNumber);
 
                         if (accountUser != null)
                         {
@@ -37,16 +54,18 @@ namespace MultiLingual_ATM_Module
 
                             if (accountUser.CardPin == _cardPin)
                             {
-                                AtmAction(accountUser);
+                                AtmMenu(accountUser);
                             }
                             else
                             {
                                 Console.WriteLine("Account Pin is not correct");
+                                goto Reenter_CardPin;
                             }
                         }
                         else
                         {
                             Console.WriteLine("User not found");
+                            goto Reenter_CardNumber;
                         }
 
 
@@ -56,47 +75,66 @@ namespace MultiLingual_ATM_Module
 
 
                 }
-                else
+                else 
                 {
-                    Console.WriteLine(Language.Translate(Global.TargetLanguageCode, "Welcome to Zenith Bank Atm Machine"));
+                    Console.WriteLine("Welcome to Zenith Bank Atm Machine");
 
-                    Console.WriteLine(Language.Translate(Global.TargetLanguageCode, "Enter your Card number"));
+                    Reenter_CardNumber:
+                    Console.WriteLine("Enter your Card number");
+
+                    if (!long.TryParse(Console.ReadLine(), out _cardNumber))
+                    {
+                        Console.WriteLine("The Card Number entered is not valid!");
+                        goto Reenter_CardNumber;
+                    }
 
 
 
-                    _cardNumber = long.Parse(Console.ReadLine());
 
-                    Console.WriteLine(Language.Translate(Global.TargetLanguageCode, "Enter your Card pin"));
+                    Reenter_CardPin:
+                    Console.WriteLine("Enter your Card pin");
 
-                    _cardPin = int.Parse(Console.ReadLine());
+                    if (!long.TryParse(Console.ReadLine(), out _cardPin))
+                    {
+                        Console.WriteLine("The Card Pin entered is not valid!");
+                        goto Reenter_CardPin;
+                    }
 
-                    if (_cardNumber != null && _cardPin != null)
+
+
+                    if (_cardNumber != 0 && _cardPin != 0)
                     {
                         AccountUser accountUser = new AccountUser();
-                        accountUser = accountUser.GenerateRandomUsers().Find(User => User.CardNumber == _cardNumber);
+                        accountUser = accountUser.UserStore().FirstOrDefault(User => User.CardNumber == _cardNumber);
 
                         if (accountUser != null)
                         {
-                            Console.WriteLine(Language.Translate(Global.TargetLanguageCode, "Account Found"));
+                            Console.WriteLine($"Welcome {accountUser.FullName}");
 
                             if (accountUser.CardPin == _cardPin)
                             {
-                                AtmAction(accountUser);
+                                AtmMenu(accountUser);
                             }
                             else
                             {
-                                Console.WriteLine(Language.Translate(Global.TargetLanguageCode, "Account Pin is not correct"));
+                                Console.WriteLine("Account Pin is not correct");
+                                goto Reenter_CardPin;
                             }
                         }
                         else
                         {
-                            Console.WriteLine(Language.Translate(Global.TargetLanguageCode, "User not found"));
+                            Console.WriteLine("User not found");
+                            goto Reenter_CardNumber;
                         }
 
 
                     }
 
+
+
+
                 }
+
 
             }
             catch (Exception ex)
@@ -105,25 +143,31 @@ namespace MultiLingual_ATM_Module
                 Console.WriteLine("An error occurred" + ex.Message);
             }
 
-
-
-
+  
         }
 
            
-        public  void AtmAction(AccountUser currentUser)
+        public  void AtmMenu(AccountUser currentUser)
             {
 
 
             try
             {
+                Console.Clear();
                 Console.WriteLine("Which operation do you want to perform? \n Reply with the appropraite number" +
-                                   "\n 1. Withdraw  \n  2. Check Balance  \n 3. Change Pin \n4. Transfer Money "
+                                   "\n 1. Withdraw  \n 2. Check Balance  \n 3. Change Pin \n 4. Transfer Money \n 5. End Session " 
                                    );
 
-                int _selectedOperation = int.Parse(Console.ReadLine());
+                int _selectedMenu;
 
-                switch (_selectedOperation)
+                Renter_Menu:
+                if (int.TryParse(Console.ReadLine(), out _selectedMenu)) {
+                    Console.WriteLine("Invalid reply! Enter a valid number from 1- 5");
+                    goto Renter_Menu;
+                }
+               
+
+                switch (_selectedMenu)
                 {
                     case 1:
                         Withdraw(currentUser);
@@ -140,8 +184,8 @@ namespace MultiLingual_ATM_Module
                         break;
 
                     default:
-
-
+                        Console.WriteLine("Invalid reply! Enter a valid number from 1 - 5");
+                        goto Renter_Menu;
                         break;
                 }
 
@@ -158,6 +202,7 @@ namespace MultiLingual_ATM_Module
 
         public void Withdraw(AccountUser currentUser)
         {
+              
 
             try
             {
@@ -269,8 +314,7 @@ namespace MultiLingual_ATM_Module
         }
 
 
-
-            public enum SelectedLanguage
+        public enum SelectedLanguage
             {
                 English = 1,
                 Pidgin,
